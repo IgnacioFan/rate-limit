@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"go-rate-limiter/internal/service/base"
+	"go-rate-limiter/internal/service/conn/redis"
 	"go-rate-limiter/internal/service/ratelimiter"
 	"net/http"
 	"strings"
@@ -13,12 +14,14 @@ import (
 type HttpServer struct {
 	*gin.Engine
 	Ratelimiter ratelimiter.Ratelimiter
+	RedisClient redis.RedisClient
 }
 
 func NewHttpServer() *HttpServer {
 	server := &HttpServer{
 		Engine:      gin.Default(),
 		Ratelimiter: ratelimiter.NewRatelimiter(),
+		RedisClient: redis.NewRedisClient(),
 	}
 	server.SetRouter()
 	return server
@@ -39,7 +42,7 @@ func (s *HttpServer) AcquireIP() gin.HandlerFunc {
 		context := base.Background()
 		clientIP := strings.Split(c.ClientIP(), ":")[0]
 		fmt.Println("Reveal client IP", clientIP)
-
+		fmt.Println(s.RedisClient.Ping(context))
 		permit, count := s.Ratelimiter.AcquireByIP(context, clientIP)
 
 		fmt.Println(context, clientIP, permit, count)
