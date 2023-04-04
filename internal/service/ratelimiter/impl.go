@@ -3,6 +3,7 @@ package ratelimiter
 import (
 	"flag"
 	"fmt"
+	"go-rate-limiter/internal/service/base"
 )
 
 var (
@@ -32,7 +33,7 @@ func NewRatelimiter() *Impl {
 	}
 }
 
-func (i *Impl) AcquireByIP(key string) (permit bool, count uint) {
-	fmt.Println("AcquireByIP", i.Strategy, *rate_limit_strategy, key)
+func (i *Impl) AcquireByIP(ctx base.Ctx, key string) (permit bool, count uint) {
+	fmt.Println("AcquireByIP", i.Strategy, *rate_limit_strategy, key, ctx)
 	return false, 2
 }

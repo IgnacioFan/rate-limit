@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"go-rate-limiter/internal/service/base"
 	"go-rate-limiter/internal/service/ratelimiter"
 	"net/http"
 	"strings"
@@ -35,10 +36,13 @@ func (s *HttpServer) SetRouter() {
 
 func (s *HttpServer) AcquireIP() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		context := base.Background()
 		clientIP := strings.Split(c.ClientIP(), ":")[0]
 		fmt.Println("Reveal client IP", clientIP)
-		permit, count := s.Ratelimiter.AcquireByIP(clientIP)
-		fmt.Println(clientIP, permit, count)
+
+		permit, count := s.Ratelimiter.AcquireByIP(context, clientIP)
+
+		fmt.Println(context, clientIP, permit, count)
 		if !permit {
 			c.JSON(http.StatusTooManyRequests, gin.H{"error": "too many request"})
 			c.Abort()

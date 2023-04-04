@@ -1,5 +1,7 @@
 package ratelimiter
 
+import "go-rate-limiter/internal/service/base"
+
 type Ratelimiter interface {
-	AcquireByIP(key string) (permit bool, count uint)
+	AcquireByIP(ctx base.Ctx, key string) (permit bool, count uint)
 }
