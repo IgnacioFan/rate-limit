@@ -44,6 +44,7 @@ func (s *HttpServer) AcquireIP() gin.HandlerFunc {
 
 		fmt.Println(context, clientIP, permit, count)
 		if !permit {
+			setAllowOrigin(c)
 			c.JSON(http.StatusTooManyRequests, gin.H{"error": "too many request"})
 			c.Abort()
 			return
