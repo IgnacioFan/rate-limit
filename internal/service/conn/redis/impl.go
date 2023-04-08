@@ -12,7 +12,7 @@ type Impl struct {
 
 func NewRedisClient() RedisClient {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     "go-rate-limit-cache:6379",
 		Password: "",
 	})
 

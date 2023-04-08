@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: build/Dockerfile.dev
+    container_name: go-rate-limit
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
+    command: "go run . server"
+
+  redis:
+    container_name: go-rate-limit-cache
+    image: redis
+    ports:
+      - 6379:6379
