@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"go-rate-limiter/internal/service/base"
+	"go-rate-limiter/internal/service/conn/redis"
+	"go-rate-limiter/internal/service/ratelimiter/strategy"
+	"go-rate-limiter/internal/service/ratelimiter/strategy/tokenbucket"
 )
 
 var (
@@ -11,29 +14,37 @@ var (
 )
 
 type Impl struct {
-	Strategy string
+	Strategy strategy.Strategy
 }
 
-func NewRatelimiter() *Impl {
-	var res string
+func NewRatelimiter(client redis.RedisClient) Ratelimiter {
+	var strategy strategy.Strategy
 	switch *rate_limit_strategy {
 	case "tokenbucket":
-		res = "NewTokenBucket"
+		strategy = tokenbucket.NewTokenBucket(client)
 	case "leakingbucket":
-		res = "NewLeakingBucket"
+		strategy = nil
+		fmt.Println("NewLeakingBucket")
 	case "slidingwindow":
-		res = "NewSlidingWindow"
+		strategy = nil
+		fmt.Println("NewSlidingWindow")
 	case "fixedwindow":
-		res = "NewTokenBucket"
+		strategy = nil
+		fmt.Println("NewFixedWindow")
 	default:
-		res = "NewTokenBucket"
+		strategy = tokenbucket.NewTokenBucket(client)
 	}
 	return &Impl{
-		Strategy: res,
+		Strategy: strategy,
 	}
 }
 
-func (i *Impl) AcquireByIP(ctx base.Ctx, key string) (permit bool, count uint) {
+func (i *Impl) AcquireByIP(ctx base.Ctx, key string) (permit bool, count uint, err error) {
 	fmt.Println("AcquireByIP", i.Strategy, *rate_limit_strategy, key, ctx)
-	return false, 2
+	permit, remain, err := i.Strategy.Acquire(ctx, key)
+	if err != nil {
+		ctx.WithField("err", err).Error("strategy.acquire failed")
+		return false, 0, err
+	}
+	return permit, uint(remain), nil
 }
