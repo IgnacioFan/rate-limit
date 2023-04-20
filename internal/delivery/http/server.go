@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"go-rate-limiter/deployment/config"
 	"go-rate-limiter/internal/service/base"
 	"go-rate-limiter/internal/service/conn/redis"
 	"go-rate-limiter/internal/service/ratelimiter"
@@ -19,9 +20,10 @@ type HttpServer struct {
 }
 
 func NewHttpServer() *HttpServer {
+	config := config.NewConfig()
 	server := &HttpServer{
 		Engine:      gin.Default(),
-		RedisClient: redis.NewRedisClient(),
+		RedisClient: redis.NewRedisClient(config),
 	}
 	server.SetRatelimiter()
 	server.SetRouter()

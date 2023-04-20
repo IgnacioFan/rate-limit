@@ -1,6 +1,7 @@
 package tokenbucket
 
 import (
+	"go-rate-limiter/deployment/config"
 	"go-rate-limiter/internal/service/base"
 	"go-rate-limiter/internal/service/conn/redis"
 	"testing"
@@ -11,7 +12,7 @@ import (
 )
 
 var (
-	client    = redis.NewRedisClient()
+	client    = redis.NewRedisClient(config.NewConfig())
 	mockCtx   = base.Background()
 	requestId = "localhost"
 	mockNow   = time.Date(2023, time.April, 1, 0, 0, 0, 0, time.UTC)

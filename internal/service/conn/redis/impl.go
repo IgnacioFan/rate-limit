@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"fmt"
+	"go-rate-limiter/deployment/config"
 	"go-rate-limiter/internal/service/base"
 
 	"github.com/go-redis/redis/v8"
@@ -10,10 +12,10 @@ type Impl struct {
 	Client *redis.Client
 }
 
-func NewRedisClient() RedisClient {
+func NewRedisClient(cfg *config.Config) RedisClient {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "go-rate-limit-cache:6379",
-		Password: "",
+		Addr:     fmt.Sprintf("%s:%v", cfg.Redis.Host, cfg.Redis.Port),
+		Password: cfg.Redis.Password,
 	})
 
 	if _, err := client.Ping(base.Background()).Result(); err != nil {

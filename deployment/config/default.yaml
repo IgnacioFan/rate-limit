@@ -1,0 +1,11 @@
+http:
+  port: 8081
+redis:
+  cluster_mode: false
+  host: "localhost"
+  port: 6379
+  password:
+  max_retries: 1
+  pool_size_per_node: 2
+  db: 2
+  dial_timeout: 15s
